@@ -56,7 +56,7 @@ class Bowheer extends CI_Controller {
 		//load in folder Zend
 		$this->zend->load('Zend/Barcode');
 		//generate barcode
-		Zend_Barcode::render('code128', 'image', array('text'=>$code), array());
+		Zend_Barcode::render('code128', 'image', array('text'=>$code,'drawText'=>FALSE), array());
 	}
 
 	public function json_list(){
