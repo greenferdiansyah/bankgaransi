@@ -83,7 +83,7 @@ class Bowheer extends CI_Controller {
 				
 				$id 		= $row['id_bowheer'];
 				
-				$kode 		= $row['no_document_bowheer'];
+				$kode 		= $row['no_bowheer'];
 				$barkode	= '<img src="'.site_url().'/bowheer/set_barcode/'.$kode.'">';
 
 				$iconAction = "<center>
