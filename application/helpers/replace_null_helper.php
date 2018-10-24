@@ -1,0 +1,1 @@
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');function replace_null_with_empty_string($array){	foreach ($array as $key => $value) 	{		if(is_array($value)){			$array[$key] = replace_null_with_empty_string($value);		}else{			if (is_null($value)){				$array[$key] = "";			}		}			}	return $array;}
