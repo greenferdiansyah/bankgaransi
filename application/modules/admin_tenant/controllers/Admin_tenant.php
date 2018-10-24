@@ -71,7 +71,7 @@ class Admin_tenant extends CI_Controller {
 			
 			foreach ($data['data'] as $rows =>$row) {
 				
-				$id 		= $row['id'];
+				$id 		= $row['id_tenant'];
 
 
 				$iconAction = "<center>
@@ -82,13 +82,14 @@ class Admin_tenant extends CI_Controller {
 				
 				$output['data'][]=array(
 					$nomor_urut, 
-					$row['company_name'],
-					$row['site_url'],
-					$row['email_support'],
-					$row['phone_support'],
-					$row['city'],
-					$row['zip_code'],
+					$row['company_code'],
+					//$row['site_url'],
+					$row['tenant_name'],
+					$row['address'],
 					($row['status']==1)?"<label class='label label-success'>active</label>":"<label class='label label-danger'>deactive</label>",
+					$row['created'],
+					$row['created_at'],
+					$row['updated'],
 					$row['updated_at'],
 					$iconAction
 				);
@@ -131,47 +132,29 @@ class Admin_tenant extends CI_Controller {
 				$action					= $this->encryption->decrypt(base64_decode($this->uri->segment(3)));
 				$id						= $this->encryption->decrypt(base64_decode($this->uri->segment(4)));
 
-				$title					= 'Add Tenant';
-				$tenant_id				= null;
-				$tenant_alias			= null;
-				$company_id 			= null;
-				$company_name			= null;
-				$company_nickname		= null;
-				$company_description	= null;
-				$logo					= null;
-				$city					= null;
-				$address 				= null;
-				$site_url				= null;
-				$zip_code 				= null;
-				$email_support 			= null;
-				$phone_support 			= null;
+				$title					= 'Add Cabang';
+				$id_tenant				= null;
+				$tenant_name			= null;
+				$company_code			= null;
+				$address	 			= null;
 				$status 				= null;
-				$created_at 			= date("Y-m-d h:m:s",time());
-				$lup					= date("Y-m-d h:m:s",time());
-				$upd	 				= $this->session->userdata('user_id');
+				// $created_at 			= date("Y-m-d h:m:s",time());
+				// $lup					= date("Y-m-d h:m:s",time());
+				// $upd	 				= $this->session->userdata('user_id');
 
 				if ($action == 'Edit') {
 					
-					$result			= $this->M_admin_tenant->detail_data($id);
+					$result					= $this->M_admin_tenant->detail_data($id);
 
-					$title					= 'Edit Tenant';
-					$tenant_id				= $result->id;
-					$tenant_alias			= $result->tenant_alias;
-					$company_id 			= $result->company_id;
-					$company_name			= $result->company_name;
-					$company_nickname		= $result->company_nickname;
-					$company_description	= $result->company_description;
-					$logo					= $result->logo;
-					$city					= $result->city;
-					$address 				= $result->address;
-					$site_url				= $result->site_url;
-					$zip_code 				= $result->zip_code;
-					$email_support 			= $result->email_support;
-					$phone_support 			= $result->phone_support;
+					$title					= 'Edit Cabang';
+					$id_tenant				= $result->id_tenant;
+					$company_code			= $result->company_code;
+					$tenant_name 			= $result->tenant_name;
+					$address				= $result->address;
 					$status 				= $result->status;
-					$created_at				= date("Y-m-d",strtotime($result->created_at));
-					$lup					= date("Y-m-d",strtotime($result->updated_at));
-					$upd					= $result->updated;
+					// $created_at			= date("Y-m-d",strtotime($result->created_at));
+					// $lup					= date("Y-m-d",strtotime($result->updated_at));
+					// $upd					= $result->updated;
 			
 				}
 
@@ -179,32 +162,21 @@ class Admin_tenant extends CI_Controller {
 				$this->drop_down->from("m_option");
 				$this->drop_down->where("option_type = 'opt_status'");
 				$this->drop_down->order("sort", "ASC");
-				$list_status	= $this->drop_down->build($status);
+				$list_status				= $this->drop_down->build($status);
 
 				$data = array(
-					'page'					=> $parent_page,
+					'parent_page'			=> $parent_page,
 					'page_content'			=> $parent_page.'_'.$page,
 					'base_url'				=> base_url(),
 					'title'					=> $title,
 					'id'					=> $id,
 					'action'				=> $action==""?'Add':'Edit',
-					'tenant_id'				=> $tenant_id,
-					'tenant_alias'			=> $tenant_alias,
-					'company_id'			=> $company_id,
-					'company_name'			=> $company_name,
-					'company_nickname'		=> $company_nickname,
-					'company_description'	=> $company_description,
-					'logo'					=> $logo,
-					'city'					=> $city,
+					'id_tenant'				=> $id_tenant,
+					'company_code'			=> $company_code,
+					'tenant_name'			=> $tenant_name,
 					'address'				=> $address,
-					'site_url'				=> $site_url,
-					'zip_code'				=> $zip_code,
-					'email_support'			=> $email_support,
-					'phone_support'			=> $phone_support,
 					'status'				=> $status,
-					'created_at'			=> $created_at,
-					'lup'					=> $lup,
-					'upd'					=> $upd,
+					// 'created_at'			=> $created_at,
 					'list_status'			=> $list_status
 				);
 
@@ -217,44 +189,29 @@ class Admin_tenant extends CI_Controller {
 
 	public function form_submit(){
 
-		$action		  = $this->input->post("action");
-		$data_company = array(
-								
-								'company_name'			=> $this->input->post("company_name"),
-								'company_nickname'		=> $this->input->post("company_nickname"),
-								'company_description'	=> $this->input->post("company_description"),
-								'logo'					=> $this->input->post("logo"),
-								'city'					=> $this->input->post("city"),
-								'address'				=> $this->input->post("address"),
-								'site_url'				=> $this->input->post("site_url"),
-								'zip_code'				=> $this->input->post("zip_code"),
-								'email_support'			=> $this->input->post("email_support"),
-								'phone_support'			=> $this->input->post("phone_support"),
-								'status'				=> $this->input->post("status"),
-								'updated_at'			=> date("Y-m-d",time()),
-								'updated'				=> $this->session->userdata('user_id')
-						);
+		$action		 = $this->input->post("action");
+
 		$data_tenant = array(
-								'id'					=> $this->input->post("tenant_id"),
-								'tenant_alias'			=> $this->input->post("tenant_alias"),
-								'company_id'			=> $this->input->post("company_id"),
-								'tenant_name'			=> $data_company["company_name"],
-								'status'				=> $data_company["status"],
-								'updated_at'			=> $data_company["updated_at"],
-								'updated'				=> $data_company["updated"]
+								'id_tenant'				=> $this->input->post("id_tenant"),
+								'company_code'			=> $this->input->post("company_code"),
+								'tenant_name'			=> $this->input->post("tenant_name"),
+								'address'				=> $this->input->post("address"),
+								'status'				=> $this->input->post("status")
+								// 'updated_at'			=> $data_company["updated_at"],
+								// 'updated'				=> $data_company["updated"]
 
 						);
 		
-		$response	= $this->M_admin_tenant->submit($action, $data_company, $data_tenant);
+		$response	= $this->M_admin_tenant->submit($action,$data_tenant);
 
 		echo json_encode(array("status"=> $response["status"], "title"=>$response["title"], "reason"=> $response["reason"]));
 	}
 
 
 	public function delete(){
-		$tenant_id 		= $this->input->post("id");
-		$response	= $this->M_admin_tenant->delete($tenant_id);
-		echo json_encode(array("status"=> $response["status"], "title"=>$response["title"], "reason"=> $response["reason"]));
+		$id_tenant	= $this->input->post("id");
+		$response	= $this->M_admin_tenant->delete($id_tenant);
+		echo json_encode(array("status"=> $response["status"],"title"=>$response["title"], "reason"=> $response["reason"]));
 	}
 }
 
